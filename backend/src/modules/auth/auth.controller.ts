@@ -1,22 +1,31 @@
-import { Request, Response, NextFunction } from 'express';
-import { AuthService } from './auth.service';
+import { Request, Response } from "express";
+import { AuthService } from "./auth.service";
+import { asyncHandler } from "../../utils/asyncHandler";
 
 const service = new AuthService();
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const user = await service.register(req.body);
-    res.status(201).json(user);
-  } catch (err) {
-    next(err);
-  }
-};
+export class AuthController {
+  private authService: AuthService;
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const result = await service.login(req.body);
-    res.json(result);
-  } catch (err) {
-    next(err);
+  constructor() {
+    this.authService = new AuthService();
   }
-};
+
+  register = asyncHandler(async (req: Request, res: Response) => {
+    const user = await this.authService.registerUser(req.body);
+
+    res.status(201).json({
+      success: true,
+      data: user,
+    });
+  });
+
+  getUsers = asyncHandler(async (req: Request, res: Response) => {
+    const users = await this.authService.getUsers();
+
+    res.status(200).json({
+      success: true,
+      data: users,
+    });
+  });
+}
