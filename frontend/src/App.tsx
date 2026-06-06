@@ -3,11 +3,28 @@ import {
   SignedOut,
   SignInButton,
   UserButton,
-  useUser,
+  useAuth
 } from "@clerk/clerk-react";
+import { getCurrentUser } from "./api/user.api";
 
 function App() {
-  const { user } = useUser();
+   const { getToken } = useAuth();
+   
+
+  const testApi = async () => {
+
+    const token =
+      await getToken();
+      console.log("Clerk token:", token);
+
+    const result =
+      await getCurrentUser(
+        token!
+      );
+
+    console.log("the result:", result);
+
+  };
 
   return (
     <div style={{ padding: "20px" }}>
@@ -18,11 +35,16 @@ function App() {
       <SignedIn>
         <UserButton />
 
-        <h2>Welcome {user?.fullName}</h2>
+       <div>
 
-        <p>Email: {user?.primaryEmailAddress?.emailAddress}</p>
 
-        <p>Clerk ID: {user?.id}</p>
+      <button
+        onClick={testApi}
+      >
+        Get Token
+      </button>
+
+    </div>
       </SignedIn>
     </div>
   );
