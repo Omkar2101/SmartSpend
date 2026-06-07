@@ -1,22 +1,70 @@
 import { Request, Response } from "express";
-
+import { GmailService } from "./gmail.service";
 import { oauth2Client } from "../../config/google";
 
+
 export class GmailController {
-  connect = async (req: Request, res: Response) => {
-    const url = oauth2Client.generateAuthUrl({
-      access_type: "offline",
-      scope: ["https://www.googleapis.com/auth/gmail.readonly"],
-    });
+  private gmailService =
+    new GmailService();
 
-    res.redirect(url);
-  };
+  initiateGmailAuthorization =
+    async (
+      req: Request,
+      res: Response
+    ) => {
 
-  callback = async (req: Request, res: Response) => {
-    res.json({
-      success: true,
-      message: "Callback hit",
-      code: req.query.code,
-    });
-  };
+      const authorizationUrl =
+        oauth2Client.generateAuthUrl({
+          access_type: "offline",
+
+          scope: [
+            "https://www.googleapis.com/auth/gmail.readonly",
+          ],
+
+          state: req.user!.clerkId,
+        });
+
+      res.redirect(
+        authorizationUrl
+      );
+    };
+
+  handleGmailAuthorizationCallback =
+    async (
+      req: Request,
+      res: Response
+    ) => {
+
+      try {
+
+        const authorizationCode =
+          req.query.code as string;
+
+        const clerkUserId =
+          req.query.state as string;
+
+        const gmailConnection =
+          await this.gmailService
+            .saveGmailConnection(
+              authorizationCode,
+              clerkUserId
+            );
+
+        res.status(200).json({
+          success: true,
+          data: gmailConnection,
+        });
+
+      } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+          success: false,
+          message:
+            "Failed to connect Gmail account",
+        });
+
+      }
+    };
 }

@@ -1,65 +1,88 @@
 generator client {
-  provider = "prisma-client-js"
+provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+provider = "postgresql"
+url = env("DATABASE_URL")
 }
 
 model User {
-  id           String    @id @default(uuid())
+id String @id @default(uuid())
 
-  clerkId      String    @unique
+clerkId String @unique
 
-  email        String    @unique
+email String @unique
 
-  name         String?
+name String?
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  invoices     Invoice[]
+invoices Invoice[]
 
-  gmailConnection GmailConnection?
+gmailConnection GmailConnection?
+emailMessages EmailMessage[]
 }
-
 
 model Invoice {
-  id              String    @id @default(uuid())
+id String @id @default(uuid())
 
-  userId          String
-  vendor          String
-  invoiceNumber   String?
-  invoiceDate     DateTime?
-  totalAmount     Float
+userId String
+vendor String
+invoiceNumber String?
+invoiceDate DateTime?
+totalAmount Float
 
-  currency        String    @default("INR")
-  category        String?
+currency String @default("INR")
+category String?
 
-  rawText         String?
+rawText String?
 
-  createdAt       DateTime  @default(now())
+createdAt DateTime @default(now())
 
-  user            User @relation(fields: [userId], references: [id])
+user User @relation(fields: [userId], references: [id])
 }
 
-
-
 model GmailConnection {
-  id            String   @id @default(uuid())
+id String @id @default(uuid())
 
-  userId        String   @unique
+userId String @unique
 
-  googleEmail   String
+googleEmail String
 
-  accessToken   String   @db.Text
+accessToken String @db.Text
 
-  refreshToken  String   @db.Text
+refreshToken String @db.Text
 
-  expiryDate    DateTime?
+expiryDate DateTime?
 
-  createdAt     DateTime @default(now())
+createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+user User @relation(fields: [userId], references: [id])
+}
+
+model EmailMessage {
+id String @id @default(uuid())
+
+gmailMessageId String @unique
+
+subject String?
+
+sender String?
+
+snippet String?
+
+receivedAt DateTime?
+
+rawPayload Json?
+
+processed Boolean @default(false)
+
+userId String
+
+createdAt DateTime @default(now())
+
+user User @relation(fields: [userId],references: [id])
+
 }
