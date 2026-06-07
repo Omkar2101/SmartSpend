@@ -20,6 +20,8 @@ model User {
   updatedAt    DateTime  @updatedAt
 
   invoices     Invoice[]
+
+  gmailConnection GmailConnection?
 }
 
 
@@ -40,4 +42,24 @@ model Invoice {
   createdAt       DateTime  @default(now())
 
   user            User @relation(fields: [userId], references: [id])
+}
+
+
+
+model GmailConnection {
+  id            String   @id @default(uuid())
+
+  userId        String   @unique
+
+  googleEmail   String
+
+  accessToken   String   @db.Text
+
+  refreshToken  String   @db.Text
+
+  expiryDate    DateTime?
+
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

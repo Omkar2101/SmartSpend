@@ -7,5 +7,6 @@ const router = Router();
 
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
+router.use("/gmail", gmailRoutes);
 
 export default router;

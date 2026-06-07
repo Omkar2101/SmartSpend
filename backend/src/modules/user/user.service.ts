@@ -1,24 +1,33 @@
-import { UserRepository } from "./user.repository";
+import { UserRepository }
+from "./user.repository";
 
 export class UserService {
+
   private userRepository =
     new UserRepository();
 
-  async syncUser(data: {
-    clerkId: string;
-    email: string;
-    name?: string;
-  }) {
+  async findOrCreateUser(
+    data: {
+      clerkId: string;
+      email: string;
+    }
+  ) {
 
     const existingUser =
-      await this.userRepository.findByClerkId(
-        data.clerkId
-      );
+      await this.userRepository
+        .findByClerkId(
+          data.clerkId
+        );
 
     if (existingUser) {
       return existingUser;
     }
 
-    return this.userRepository.createUser(data);
+    return this.userRepository
+      .createUser({
+        clerkId: data.clerkId,
+        email: data.email,
+        name:data.email.split("@")[0],
+      });
   }
 }
