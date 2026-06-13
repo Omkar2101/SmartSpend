@@ -1,5 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Design Tokens - Light Theme (Notion Neutral-Grey Inspired) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f5;
+  --bg-hover: rgba(55, 53, 47, 0.06);
+  --border-color: #edebe9;
+  --text-primary: #37352f;
+  --text-secondary: #7a7977;
+  --text-link: #2383e2;
+  
+  --accent-blue: #2383e2;
+  --accent-blue-bg: rgba(35, 131, 226, 0.08);
+  --accent-red: #eb5757;
+  --accent-red-bg: rgba(235, 87, 87, 0.08);
+  --accent-green: #0f7b44;
+  --accent-green-bg: rgba(15, 123, 68, 0.08);
+  --accent-yellow: #dfab01;
+  --accent-yellow-bg: rgba(223, 171, 1, 0.08);
+  --accent-gray: #7a7977;
+  --accent-gray-bg: rgba(122, 121, 119, 0.08);
+  --accent-orange: #d9730d;
+  --accent-orange-bg: rgba(217, 115, 13, 0.08);
+  --accent-purple: #6931b4;
+  --accent-purple-bg: rgba(105, 49, 180, 0.08);
+  --accent-pink: #ad1a72;
+  --accent-pink-bg: rgba(173, 26, 114, 0.08);
+
+  --shadow-sm: 0 1px 2px rgba(15, 15, 15, 0.05);
+  --shadow-md: 0 2px 4px rgba(15, 15, 15, 0.05), 0 4px 12px rgba(15, 15, 15, 0.05);
+  --shadow-lg: 0 8px 24px rgba(15, 15, 15, 0.08);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Dark Theme overrides when .dark is present */
+.dark {
+  --bg-primary: #191919;
+  --bg-secondary: #202020;
+  --bg-hover: rgba(255, 255, 255, 0.055);
+  --border-color: #2f2f2f;
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --text-link: #2f81f7;
+
+  --accent-blue: #2f81f7;
+  --accent-blue-bg: rgba(47, 129, 247, 0.15);
+  --accent-red: #ff6b6b;
+  --accent-red-bg: rgba(255, 107, 107, 0.15);
+  --accent-green: #2ecc71;
+  --accent-green-bg: rgba(46, 204, 113, 0.15);
+  --accent-yellow: #f1c40f;
+  --accent-yellow-bg: rgba(241, 196, 15, 0.15);
+  --accent-gray: #8b8b8b;
+  --accent-gray-bg: rgba(139, 139, 139, 0.15);
+  --accent-orange: #e67e22;
+  --accent-orange-bg: rgba(230, 126, 34, 0.15);
+  --accent-purple: #9b59b6;
+  --accent-purple-bg: rgba(155, 89, 182, 0.15);
+  --accent-pink: #ec4899;
+  --accent-pink-bg: rgba(236, 72, 153, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Base custom hover actions for list items */
+.dropdown-item-hover:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+/* Notion-like custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Styled loading spinner */
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+/* Notion Callout Box Style */
+.notion-callout {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notion-callout-emoji {
+  font-size: 18px;
+  user-select: none;
+}
+
+.notion-callout-text {
+  color: var(--text-primary);
+}
+
+/* Input Fields styling */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--text-secondary);
+  box-shadow: 0 0 0 2px var(--bg-hover);
 }

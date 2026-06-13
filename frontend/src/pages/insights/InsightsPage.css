@@ -1,0 +1,128 @@
+/* InsightsPage.css - AI finance analyst workspace chat and suggestions */
+
+.insights-page {
+  animation: fadeIn 0.25s ease-out;
+}
+
+.insights-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.insight-card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.insight-card h2 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.insight-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* AI Chat Section styling */
+.ai-analyst-section {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+  margin-top: 10px;
+}
+
+.ai-analyst-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+
+.ai-analyst-header h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-analyst-header p {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
+}
+
+.chat-history {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.chat-bubble.user {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  align-self: flex-end;
+}
+
+.chat-bubble.assistant {
+  background-color: var(--accent-purple-bg);
+  border: 1px solid rgba(105, 49, 180, 0.15);
+  color: var(--text-primary);
+  align-self: flex-start;
+}
+
+.typing-indicator {
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Chat Input Bar */
+.chat-input-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input-field {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13.5px;
+}

@@ -1,0 +1,102 @@
+/* ExpenseDetailPage.css - Notion property sheet style view */
+
+.expense-detail {
+  animation: fadeIn 0.25s ease-out;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.detail-header h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Detail Card resembling Notion properties list */
+.detail-card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.properties-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 600px;
+}
+
+.property-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.property-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.property-value {
+  color: var(--text-primary);
+}
+
+.property-value.amount {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Receipt content panel */
+.receipt-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  margin-top: 8px;
+}
+
+.receipt-section h3 {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.raw-text {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+  .property-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
