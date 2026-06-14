@@ -9,6 +9,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
 import { Link } from 'react-router-dom';
 import ROUTES from '../../routes/routes';
+import { useAuth } from "@clerk/clerk-react";
 import './DashboardPage.css';
 
 // Map categories to accent colors
@@ -24,6 +25,22 @@ const CATEGORY_COLORS: Record<string, string> = {
 export const DashboardPage: React.FC = () => {
   const { data: user, isLoading: userLoading, error: userError } = useCurrentUser();
   const { data: stats, isLoading: statsLoading } = useExpenseStats();
+   const { getToken } = useAuth();
+  const syncEmails = async () => {
+    const token = await getToken();
+    console.log("token going to backend:",token);
+    
+
+    await fetch(
+        "http://localhost:5000/api/v1/emails/sync",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+};
   const { data: invoices, isLoading: invoicesLoading } = useInvoices(
     {},
     { page: 1, limit: 5 }
@@ -220,6 +237,13 @@ export const DashboardPage: React.FC = () => {
             <Link to={ROUTES.GMAIL} className="cta-link">
               Manage Gmail Integration →
             </Link>
+          </div>
+           <div className="cta-card cta-card-blue">
+            <h3>📨 Gmail Sync Agent</h3>
+            <p>Automatically import and parse bills directly from your inbox using secure email sync.</p>
+           <button onClick={syncEmails}>
+            Sync Gmail
+           </button>
           </div>
         </div>
       </div>

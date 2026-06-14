@@ -19,9 +19,12 @@ export class GmailController {
 
           scope: [
             "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/userinfo.email",
           ],
 
-          state: req.user!.clerkId,
+          // state: req.user!.clerkId,
+          state: "user_3Ekp3aYjvN8d8HHZ0JybrQEXBie",
+
         });
 
       res.redirect(
