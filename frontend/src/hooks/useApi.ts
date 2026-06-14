@@ -4,6 +4,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { useAuth } from '@clerk/clerk-react';
 import mockDb from '../utils/mockDb';
 import type {
   User,
@@ -211,14 +213,24 @@ export const useSyncGmailEmails = () => {
 /**
  * Hook to fetch email messages
  */
-export const useEmailMessages = (page?: number, limit?: number) => {
+export const useEmailMessages = (page = 1, limit = 50) => {
+  const { getToken } = useAuth();
   return useQuery({
     queryKey: ['email', 'messages', page, limit],
     queryFn: async (): Promise<EmailMessage[]> => {
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      return mockDb.getEmailMessages();
+      const token = await getToken();
+      const res = await fetch(
+        `http://localhost:5000/api/v1/emails?page=${page}&limit=${limit}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.message || 'Failed to fetch emails');
+      }
+      const body = await res.json();
+      return body.data as EmailMessage[];
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: 1 * 60 * 1000,
   });
 };
 

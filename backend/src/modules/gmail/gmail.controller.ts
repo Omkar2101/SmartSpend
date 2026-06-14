@@ -53,10 +53,13 @@ export class GmailController {
               clerkUserId
             );
 
-        res.status(200).json({
-          success: true,
-          data: gmailConnection,
-        });
+        // res.status(200).json({
+        //   success: true,
+        //   data: gmailConnection,
+        // });
+        res.redirect(
+    "http://localhost:5173/dashboard?gmail=connected"
+);
 
       } catch (error) {
 
@@ -70,4 +73,37 @@ export class GmailController {
 
       }
     };
+  
+  generateAuthorizationUrl = async (
+    req: Request,
+    res: Response
+) => {
+
+    try {
+
+        const authorizationUrl =
+            this.gmailService.generateAuthorizationUrl(
+                req.user!.clerkId
+            );
+
+        res.status(200).json({
+            success: true,
+            data: {
+                authorizationUrl,
+            },
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message:
+                "Failed to generate Gmail authorization URL",
+        });
+
+    }
+
+};
 }

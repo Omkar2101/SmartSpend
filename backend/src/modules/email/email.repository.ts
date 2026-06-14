@@ -21,4 +21,30 @@ export class EmailRepository {
 
   }
 
+  async findByUserId(
+    userId: string,
+    page = 1,
+    limit = 50
+  ) {
+
+    return prisma.emailMessage.findMany({
+      where: { userId },
+      orderBy: { receivedAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        gmailMessageId: true,
+        subject: true,
+        sender: true,
+        snippet: true,
+        receivedAt: true,
+        processed: true,
+        createdAt: true,
+        userId: true,
+      },
+    });
+
+  }
+
 }

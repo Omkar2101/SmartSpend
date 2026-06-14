@@ -28,4 +28,24 @@ export class GmailService {
       expiryDate: tokens.expiry_date ? new Date(tokens.expiry_date) : undefined,
     });
   }
+
+  generateAuthorizationUrl(
+    clerkId: string
+) {
+
+    return oauth2Client.generateAuthUrl({
+
+        access_type: "offline",
+
+        prompt: "consent",
+
+        scope: [
+            "https://www.googleapis.com/auth/gmail.readonly",
+        ],
+
+        state: clerkId,
+
+    });
+
+}
 }

@@ -3,7 +3,8 @@
  * Notion-style dashboard showing expense overview, budget progress, and integrations
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useCurrentUser, useExpenseStats, useInvoices } from '../../hooks/useApi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
@@ -25,22 +26,64 @@ const CATEGORY_COLORS: Record<string, string> = {
 export const DashboardPage: React.FC = () => {
   const { data: user, isLoading: userLoading, error: userError } = useCurrentUser();
   const { data: stats, isLoading: statsLoading } = useExpenseStats();
-   const { getToken } = useAuth();
-  const syncEmails = async () => {
-    const token = await getToken();
-    console.log("token going to backend:",token);
-    
+  const { getToken } = useAuth();
+  const [isSyncing, setIsSyncing] = useState(false);
 
-    await fetch(
-        "http://localhost:5000/api/v1/emails/sync",
-        {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
-    );
-};
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('gmail') === 'connected') {
+      toast.success('Gmail connected! Click Sync Emails to import your bills.', {
+        duration: 6000,
+        icon: '📬',
+      });
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
+  const syncEmails = async () => {
+    setIsSyncing(true);
+    try {
+      const token = await getToken();
+      const res = await fetch('http://localhost:5000/api/v1/emails/sync', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.message || `Server error (${res.status})`);
+      }
+      const body = await res.json();
+      const { fetched = 0, inserted = 0 } = body?.data ?? {};
+      toast.success(
+        `Sync complete — ${inserted} new email${inserted !== 1 ? 's' : ''} imported (${fetched} fetched).`,
+        { duration: 5000, icon: '📨' }
+      );
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Sync failed. Please try again.';
+      toast.error(message, { duration: 6000 });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const connectGmail = async () => {
+    try {
+      const token = await getToken();
+      const res = await fetch('http://localhost:5000/api/v1/gmail/authorization-url', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.message || `Could not get authorization URL (${res.status})`);
+      }
+      const data = await res.json();
+      window.location.href = data.data.authorizationUrl;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to start Gmail connection.';
+      toast.error(message, { duration: 6000 });
+    }
+  };
+
   const { data: invoices, isLoading: invoicesLoading } = useInvoices(
     {},
     { page: 1, limit: 5 }
@@ -74,7 +117,7 @@ export const DashboardPage: React.FC = () => {
           <p className="page-header-desc">Here is the spending summary for your current workspace</p>
         </div>
 
-        {/* Callout Info Banner */}
+{/* Callout Info Banner */}
         <div className="notion-callout">
           <span className="notion-callout-emoji">🎯</span>
           <div className="notion-callout-text">
@@ -115,7 +158,7 @@ export const DashboardPage: React.FC = () => {
 
         {/* Dashboard Sections */}
         <div className="dashboard-sections">
-          
+
           {/* Category Breakdown (Progress bars) */}
           <div className="dashboard-section">
             <div className="section-header">
@@ -147,7 +190,7 @@ export const DashboardPage: React.FC = () => {
                         </span>
                       </div>
                       <div className="category-bar-bg">
-                        <div 
+                        <div
                           className="category-bar-fill"
                           style={{
                             width: `${ratio}%`,
@@ -190,7 +233,7 @@ export const DashboardPage: React.FC = () => {
                           </Link>
                         </td>
                         <td>
-                          <span 
+                          <span
                             className="notion-tag"
                             style={{
                               backgroundColor: `${CATEGORY_COLORS[invoice.category || ''] || 'var(--accent-blue)'}14`,
@@ -221,8 +264,9 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic CTA Cards using Notion colored banners */}
+        {/* Dynamic CTA Cards */}
         <div className="dashboard-cta">
+          {/* AI Analyst CTA */}
           <div className="cta-card cta-card-purple">
             <h3>🤖 AI Financial Analyst</h3>
             <p>Get immediate advice on how to reduce software costs and optimize your food budgets.</p>
@@ -231,19 +275,27 @@ export const DashboardPage: React.FC = () => {
             </Link>
           </div>
 
+          {/* Gmail Integration CTA — unified card */}
           <div className="cta-card cta-card-blue">
-            <h3>📨 Gmail Sync Agent</h3>
-            <p>Automatically import and parse bills directly from your inbox using secure email sync.</p>
-            <Link to={ROUTES.GMAIL} className="cta-link">
-              Manage Gmail Integration →
-            </Link>
-          </div>
-           <div className="cta-card cta-card-blue">
-            <h3>📨 Gmail Sync Agent</h3>
-            <p>Automatically import and parse bills directly from your inbox using secure email sync.</p>
-           <button onClick={syncEmails}>
-            Sync Gmail
-           </button>
+            <h3>📨 Gmail Integration</h3>
+            <p>Connect your inbox to automatically import and parse bills. Once connected, sync to pull the latest emails.</p>
+            <div className="cta-actions">
+              <button
+                id="btn-connect-gmail"
+                className="cta-btn cta-btn-outline"
+                onClick={connectGmail}
+              >
+                Connect Gmail
+              </button>
+              <button
+                id="btn-sync-emails"
+                className="cta-btn cta-btn-solid"
+                onClick={syncEmails}
+                disabled={isSyncing}
+              >
+                {isSyncing ? 'Syncing…' : 'Sync Emails'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

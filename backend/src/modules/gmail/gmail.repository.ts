@@ -37,4 +37,33 @@ export class GmailRepository {
 
   }
 
-}
+  async updateTokens(
+    id: string,
+    data: {
+      accessToken: string;
+      refreshToken?: string;
+      expiryDate?: Date;
+    }
+  ) {
+
+    return prisma.gmailConnection.update({
+      where: { id },
+      data: {
+        accessToken: data.accessToken,
+        ...(data.refreshToken && { refreshToken: data.refreshToken }),
+        ...(data.expiryDate && { expiryDate: data.expiryDate }),
+      },
+    });
+
+  }
+
+  async updateLastSyncedAt(id: string, syncedAt: Date) {
+
+    return prisma.gmailConnection.update({
+      where: { id },
+      data: { lastSyncedAt: syncedAt },
+    });
+
+  }
+
+}
