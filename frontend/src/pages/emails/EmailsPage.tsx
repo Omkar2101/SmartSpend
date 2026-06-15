@@ -49,6 +49,28 @@ export const EmailsPage: React.FC = () => {
     }
   };
 
+  const processExpense = async (emailId: string) => {
+    const toastId = toast.loading("Processing expense...");
+    try {
+      const token = await getToken();
+      await fetch(
+        `http://localhost:5000/api/v1/expenses/process/${emailId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Processing enqueued!", { id: toastId });
+      refetch();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to process", { id: toastId });
+    }
+  };
+
+
   if (loadingMessages) {
     return <LoadingSpinner text="Loading your email inbox…" />;
   }
@@ -99,9 +121,19 @@ export const EmailsPage: React.FC = () => {
                     <span className="email-sender">From: {msg.sender || 'Unknown'}</span>
                   </div>
 
-                  <span className={`notion-tag notion-tag-${msg.processed ? 'green' : 'blue'}`}>
-                    {msg.processed ? 'Processed' : 'Unprocessed'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className={`notion-tag notion-tag-${msg.processed ? 'green' : 'blue'}`}>
+                      {msg.processed ? 'Processed' : 'Unprocessed'}
+                    </span>
+                    {!msg.processed && (
+                      <button
+                        className="btn-process-expense"
+                        onClick={() => processExpense(msg.gmailMessageId || msg.id)}
+                      >
+                        Process
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <p className="email-snippet">{msg.snippet || 'No preview available'}</p>

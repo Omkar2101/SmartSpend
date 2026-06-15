@@ -8,21 +8,18 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-const startServer =
-    async () => {
-
+const startServer = async () => {
+    try {
         await connectRabbitMQ();
-
         await startExpenseConsumer();
+    } catch (error) {
+        console.warn("⚠️ RabbitMQ connection failed. Some background tasks (like email sync processing) may not work.", error);
+    }
 
-        app.listen(PORT, () => {
+    app.listen(PORT, () => {
+        console.log(`Server running on ${PORT}`);
+    });
+};
 
-            console.log(
-                `Server running on ${PORT}`
-            );
-
-        });
-
-    };
 
 startServer();
