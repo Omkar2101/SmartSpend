@@ -1,11 +1,28 @@
 // Server initialization and startup
 import dotenv from "dotenv";
-dotenv.config();
-
+import { connectRabbitMQ } from "./config/rabbitmq";
+import { startExpenseConsumer } from "./consumers/expense.consumer";
 import app from "./app";
+
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Backend running on port ${PORT}`);
-});
+const startServer =
+    async () => {
+
+        await connectRabbitMQ();
+
+        await startExpenseConsumer();
+
+        app.listen(PORT, () => {
+
+            console.log(
+                `Server running on ${PORT}`
+            );
+
+        });
+
+    };
+
+startServer();
