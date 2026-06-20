@@ -109,6 +109,7 @@ export interface EmailMessage {
   receivedAt?: string;
   rawPayload?: Record<string, unknown>;
   processed: boolean;
+  processingStatus?: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
   userId: string;
   createdAt: string;
 }

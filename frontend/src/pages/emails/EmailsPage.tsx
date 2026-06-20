@@ -122,15 +122,21 @@ export const EmailsPage: React.FC = () => {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className={`notion-tag notion-tag-${msg.processed ? 'green' : 'blue'}`}>
-                      {msg.processed ? 'Processed' : 'Unprocessed'}
+                    <span className={`notion-tag notion-tag-${
+                      msg.processingStatus === 'PROCESSED' || msg.processed ? 'green' :
+                      msg.processingStatus === 'PROCESSING' ? 'yellow' :
+                      msg.processingStatus === 'FAILED' ? 'red' : 'blue'
+                    }`}>
+                      {msg.processingStatus === 'PROCESSED' || msg.processed ? 'Processed' :
+                       msg.processingStatus === 'PROCESSING' ? 'Processing...' :
+                       msg.processingStatus === 'FAILED' ? 'Failed' : 'Unprocessed'}
                     </span>
-                    {!msg.processed && (
+                    {msg.processingStatus !== 'PROCESSED' && msg.processingStatus !== 'PROCESSING' && !msg.processed && (
                       <button
                         className="btn-process-expense"
                         onClick={() => processExpense(msg.gmailMessageId || msg.id)}
                       >
-                        Process
+                        {msg.processingStatus === 'FAILED' ? 'Retry' : 'Process'}
                       </button>
                     )}
                   </div>
@@ -144,9 +150,17 @@ export const EmailsPage: React.FC = () => {
                   </span>
 
                   <div className="email-action-area">
-                    {msg.processed ? (
+                    {msg.processingStatus === 'PROCESSED' || msg.processed ? (
                       <span style={{ color: 'var(--accent-green)', fontWeight: 500, fontSize: '13px' }}>
                         ✓ Added to Expenses
+                      </span>
+                    ) : msg.processingStatus === 'PROCESSING' ? (
+                      <span style={{ color: 'var(--accent-yellow)', fontWeight: 500, fontSize: '13px' }}>
+                        ⏳ Processing...
+                      </span>
+                    ) : msg.processingStatus === 'FAILED' ? (
+                      <span style={{ color: 'var(--accent-red)', fontWeight: 500, fontSize: '13px' }}>
+                        ❌ Processing Failed
                       </span>
                     ) : (
                       <span style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
