@@ -120,8 +120,8 @@ export class EmailService {
         let pageToken: string | undefined = undefined;
         const MAX_EMAILS = 500; // safety cap
 
-        do {
-            const listResponse = await gmail.users.messages.list({
+        while (allMessages.length < MAX_EMAILS) {
+            const listResponse: any = await gmail.users.messages.list({
                 userId: "me",
                 q: query,
                 maxResults: 100, // max allowed per page
@@ -138,7 +138,10 @@ export class EmailService {
                 `(total so far: ${allMessages.length}, nextPageToken: ${!!pageToken})`
             );
 
-        } while (pageToken && allMessages.length < MAX_EMAILS);
+            if (!pageToken) {
+                break;
+            }
+        }
 
         console.log(`Total expense emails from Gmail: ${allMessages.length}`);
 

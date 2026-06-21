@@ -24,12 +24,20 @@ import type {
  * Hook to fetch current user profile
  */
 export const useCurrentUser = () => {
+  const { getToken } = useAuth();
   return useQuery({
     queryKey: ["user", "current"],
     queryFn: async (): Promise<User> => {
-      // Simulate network latency
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return mockDb.getUser();
+      const token = await getToken();
+      const res = await fetch("http://localhost:5000/api/v1/users/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.message || "Failed to fetch user");
+      }
+      const body = await res.json();
+      return body.data as User;
     },
     staleTime: 5 * 60 * 1000,
     retry: 1,

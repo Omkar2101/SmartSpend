@@ -10,6 +10,7 @@ export interface AuthUser {
 }
 
 export interface RegisterUserRequest {
+  clerkId: string;
   email: string;
   name?: string;
 }

@@ -12,7 +12,7 @@ export const extractExpense = async (email: EmailData) => {
   const prompt = buildExpensePrompt(email);
 
   const result = await geminiModel.models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: "gemini-2.5-flash",
     contents: prompt,
   });
   console.log("Gemini Response:", result.text);

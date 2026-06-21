@@ -29,20 +29,32 @@ model User {
 model Invoice {
   id String @id @default(uuid())
 
-  userId        String
-  vendor        String
-  invoiceNumber String?
-  invoiceDate   DateTime?
-  totalAmount   Float
+  userId String
 
-  currency String  @default("INR")
+  emailMessageId String? @unique
+
+  vendor String
+
+  invoiceNumber String?
+
+  invoiceDate DateTime?
+
+  totalAmount Float
+
+  currency String @default("INR")
+
   category String?
+
+  confidence Float?
 
   rawText String?
 
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+
+  emailMessage EmailMessage?@relation(fields: [emailMessageId],references: [id])
+    
 }
 
 model GmailConnection {
@@ -98,6 +110,8 @@ model EmailMessage {
   processingStatus ProcessingStatus @default(PENDING)
 
   processedAt DateTime?
+
+  invoice Invoice?
 }
 
 model Notification {

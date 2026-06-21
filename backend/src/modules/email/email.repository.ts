@@ -1,3 +1,4 @@
+import { ProcessingStatus } from "@prisma/client";
 import prisma from "../../config/prisma";
 
 export class EmailRepository {
@@ -45,6 +46,31 @@ export class EmailRepository {
       },
     });
 
+  }
+
+  async findByGmailMessageId(
+    gmailMessageId: string
+) {
+    return prisma.emailMessage.findUnique({
+        where: {
+            gmailMessageId,
+        },
+    });
+}
+
+  async updateProcessingStatus(
+    emailMessageId: string,
+    status: ProcessingStatus
+  ) {
+    return prisma.emailMessage.update({
+      where: {
+        gmailMessageId: emailMessageId,
+      },
+      data: {
+        processingStatus: status,
+        processedAt: status === ProcessingStatus.PROCESSED ? new Date() : null,
+      },
+    });
   }
 
 }

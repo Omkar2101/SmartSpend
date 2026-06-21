@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 export const registerUserSchema = z.object({
+  clerkId: z.string().min(1, "Clerk ID is required"),
+
   email: z
     .string()
     .email("Invalid email format"),
