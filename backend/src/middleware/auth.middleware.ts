@@ -12,6 +12,12 @@ export const requireAuth = async (
   next: NextFunction
 ) => {
   try {
+    console.log("=== AUTH START ===");
+
+    console.log(
+      "Authorization Header:",
+      req.headers.authorization
+    );
     const authHeader =
       req.headers.authorization;
 
@@ -27,6 +33,12 @@ export const requireAuth = async (
         "Bearer ",
         ""
       );
+
+    console.log("Clean token:", token);
+
+    console.log(
+      "Verifying token..."
+    );
 
     /**
      * Verify token with Clerk
@@ -71,6 +83,10 @@ export const requireAuth = async (
     next();
 
   } catch (error) {
+    console.error(
+      "AUTH ERROR:",
+      error
+    );
 
     return res.status(401).json({
       success: false,

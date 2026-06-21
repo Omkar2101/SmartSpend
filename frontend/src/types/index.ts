@@ -10,6 +10,7 @@ export interface AuthUser {
 }
 
 export interface RegisterUserRequest {
+  clerkId: string;
   email: string;
   name?: string;
 }
@@ -109,6 +110,7 @@ export interface EmailMessage {
   receivedAt?: string;
   rawPayload?: Record<string, unknown>;
   processed: boolean;
+  processingStatus?: 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
   userId: string;
   createdAt: string;
 }

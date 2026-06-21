@@ -1,88 +1,131 @@
 generator client {
-provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-provider = "postgresql"
-url = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-id String @id @default(uuid())
+  id String @id @default(uuid())
 
-clerkId String @unique
+  clerkId String @unique
 
-email String @unique
+  email String @unique
 
-name String?
+  name String?
 
-createdAt DateTime @default(now())
-updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-invoices Invoice[]
+  invoices Invoice[]
 
-gmailConnection GmailConnection?
-emailMessages EmailMessage[]
+  gmailConnection GmailConnection?
+  emailMessages   EmailMessage[]
+  notifications   Notification[]
 }
 
 model Invoice {
-id String @id @default(uuid())
+  id String @id @default(uuid())
 
-userId String
-vendor String
-invoiceNumber String?
-invoiceDate DateTime?
-totalAmount Float
+  userId String
 
-currency String @default("INR")
-category String?
+  emailMessageId String? @unique
 
-rawText String?
+  vendor String
 
-createdAt DateTime @default(now())
+  invoiceNumber String?
 
-user User @relation(fields: [userId], references: [id])
+  invoiceDate DateTime?
+
+  totalAmount Float
+
+  currency String @default("INR")
+
+  category String?
+
+  confidence Float?
+
+  rawText String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  emailMessage EmailMessage?@relation(fields: [emailMessageId],references: [id])
+    
 }
 
 model GmailConnection {
-id String @id @default(uuid())
+  id String @id @default(uuid())
 
-userId String @unique
+  userId String @unique
 
-googleEmail String
+  googleEmail String
 
-accessToken String @db.Text
+  accessToken String @db.Text
 
-refreshToken String @db.Text
+  refreshToken String @db.Text
 
-expiryDate DateTime?
+  expiryDate DateTime?
 
-createdAt DateTime @default(now())
+  lastSyncedAt DateTime?
 
-user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  PROCESSED
+  FAILED
 }
 
 model EmailMessage {
-id String @id @default(uuid())
+  id String @id @default(uuid())
 
-gmailMessageId String @unique
+  gmailMessageId String @unique
 
-subject String?
+  subject String?
 
-sender String?
+  sender String?
 
-snippet String?
+  snippet String?
 
-receivedAt DateTime?
+  receivedAt DateTime?
 
-rawPayload Json?
+  rawPayload Json?
 
-processed Boolean @default(false)
+  processed Boolean @default(false)
 
-userId String
+  userId String
 
-createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 
-user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId], references: [id])
 
+  processingStatus ProcessingStatus @default(PENDING)
+
+  processedAt DateTime?
+
+  invoice Invoice?
+}
+
+model Notification {
+  id String @id @default(cuid())
+
+  userId String
+
+  title String
+
+  message String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

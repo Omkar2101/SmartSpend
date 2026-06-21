@@ -3,8 +3,10 @@
  * These hooks encapsulate API calls and state management, redirected to mockDb
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import mockDb from '../utils/mockDb';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { useAuth } from "@clerk/clerk-react";
+import mockDb from "../utils/mockDb";
 import type {
   User,
   Invoice,
@@ -14,7 +16,7 @@ import type {
   UpdateInvoiceRequest,
   InvoiceFilters,
   PaginationParams,
-} from '../types';
+} from "../types";
 
 // ============ User Hooks ============
 
@@ -22,12 +24,20 @@ import type {
  * Hook to fetch current user profile
  */
 export const useCurrentUser = () => {
+  const { getToken } = useAuth();
   return useQuery({
-    queryKey: ['user', 'current'],
+    queryKey: ["user", "current"],
     queryFn: async (): Promise<User> => {
-      // Simulate network latency
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return mockDb.getUser();
+      const token = await getToken();
+      const res = await fetch("http://localhost:5000/api/v1/users/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.message || "Failed to fetch user");
+      }
+      const body = await res.json();
+      return body.data as User;
     },
     staleTime: 5 * 60 * 1000,
     retry: 1,
@@ -41,10 +51,10 @@ export const useCurrentUser = () => {
  */
 export const useInvoices = (
   filters?: InvoiceFilters,
-  pagination?: PaginationParams
+  pagination?: PaginationParams,
 ) => {
   return useQuery({
-    queryKey: ['invoices', filters, pagination],
+    queryKey: ["invoices", filters, pagination],
     queryFn: async (): Promise<Invoice[]> => {
       await new Promise((resolve) => setTimeout(resolve, 400));
       return mockDb.getInvoices(filters);
@@ -58,7 +68,7 @@ export const useInvoices = (
  */
 export const useInvoice = (invoiceId: string | null) => {
   return useQuery({
-    queryKey: ['invoices', invoiceId],
+    queryKey: ["invoices", invoiceId],
     queryFn: async (): Promise<Invoice> => {
       await new Promise((resolve) => setTimeout(resolve, 200));
       return mockDb.getInvoiceById(invoiceId!);
@@ -73,14 +83,14 @@ export const useInvoice = (invoiceId: string | null) => {
  */
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: CreateInvoiceRequest): Promise<Invoice> => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return mockDb.createInvoice(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
   });
 };
@@ -90,7 +100,7 @@ export const useCreateInvoice = () => {
  */
 export const useUpdateInvoice = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async ({
       invoiceId,
@@ -103,7 +113,7 @@ export const useUpdateInvoice = () => {
       return mockDb.updateInvoice(invoiceId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
   });
 };
@@ -113,14 +123,14 @@ export const useUpdateInvoice = () => {
  */
 export const useDeleteInvoice = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (invoiceId: string): Promise<void> => {
       await new Promise((resolve) => setTimeout(resolve, 400));
       mockDb.deleteInvoice(invoiceId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
   });
 };
@@ -130,7 +140,7 @@ export const useDeleteInvoice = () => {
  */
 export const useExpenseStats = () => {
   return useQuery({
-    queryKey: ['invoices', 'stats'],
+    queryKey: ["invoices", "stats"],
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
       return mockDb.getExpenseStats();
@@ -146,7 +156,7 @@ export const useExpenseStats = () => {
  */
 export const useGmailConnection = () => {
   return useQuery({
-    queryKey: ['gmail', 'connection'],
+    queryKey: ["gmail", "connection"],
     queryFn: async (): Promise<GmailConnection | null> => {
       await new Promise((resolve) => setTimeout(resolve, 250));
       return mockDb.getGmailConnection();
@@ -160,14 +170,14 @@ export const useGmailConnection = () => {
  */
 export const useConnectGmail = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (): Promise<void> => {
       await new Promise((resolve) => setTimeout(resolve, 800));
       mockDb.setGmailConnected(true);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gmail'] });
+      queryClient.invalidateQueries({ queryKey: ["gmail"] });
     },
   });
 };
@@ -177,14 +187,14 @@ export const useConnectGmail = () => {
  */
 export const useDisconnectGmail = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (): Promise<void> => {
       await new Promise((resolve) => setTimeout(resolve, 600));
       mockDb.setGmailConnected(false);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gmail'] });
+      queryClient.invalidateQueries({ queryKey: ["gmail"] });
     },
   });
 };
@@ -194,14 +204,14 @@ export const useDisconnectGmail = () => {
  */
 export const useSyncGmailEmails = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (): Promise<EmailMessage[]> => {
       await new Promise((resolve) => setTimeout(resolve, 1200)); // Syncing animation
       return mockDb.syncGmailEmails();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email'] });
+      queryClient.invalidateQueries({ queryKey: ["email"] });
     },
   });
 };
@@ -211,14 +221,24 @@ export const useSyncGmailEmails = () => {
 /**
  * Hook to fetch email messages
  */
-export const useEmailMessages = (page?: number, limit?: number) => {
+export const useEmailMessages = (page = 1, limit = 50) => {
+  const { getToken } = useAuth();
   return useQuery({
-    queryKey: ['email', 'messages', page, limit],
+    queryKey: ["email", "messages", page, limit],
     queryFn: async (): Promise<EmailMessage[]> => {
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      return mockDb.getEmailMessages();
+      const token = await getToken();
+      const res = await fetch(
+        `http://localhost:5000/api/v1/emails?page=${page}&limit=${limit}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.message || "Failed to fetch emails");
+      }
+      const body = await res.json();
+      return body.data as EmailMessage[];
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: 1 * 60 * 1000,
   });
 };
 
@@ -227,10 +247,10 @@ export const useEmailMessages = (page?: number, limit?: number) => {
  */
 export const useUnreadMessages = () => {
   return useQuery({
-    queryKey: ['email', 'unread'],
+    queryKey: ["email", "unread"],
     queryFn: async (): Promise<EmailMessage[]> => {
       await new Promise((resolve) => setTimeout(resolve, 300));
-      return mockDb.getEmailMessages().filter(m => !m.processed);
+      return mockDb.getEmailMessages().filter((m) => !m.processed);
     },
     staleTime: 1 * 60 * 1000,
   });
@@ -241,19 +261,19 @@ export const useUnreadMessages = () => {
  */
 export const useMarkAsRead = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (messageId: string): Promise<void> => {
       await new Promise((resolve) => setTimeout(resolve, 200));
       const emails = mockDb.getEmailMessages();
-      const idx = emails.findIndex(e => e.id === messageId);
+      const idx = emails.findIndex((e) => e.id === messageId);
       if (idx !== -1) {
         emails[idx].processed = true;
-        localStorage.setItem('smartspend_emails', JSON.stringify(emails));
+        localStorage.setItem("smartspend_emails", JSON.stringify(emails));
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['email'] });
+      queryClient.invalidateQueries({ queryKey: ["email"] });
     },
   });
 };
@@ -263,15 +283,15 @@ export const useMarkAsRead = () => {
  */
 export const useProcessEmailMessage = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (messageId: string): Promise<EmailMessage> => {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // processing visual delay
       return mockDb.processEmailMessage(messageId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      queryClient.invalidateQueries({ queryKey: ['email'] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["email"] });
     },
   });
 };

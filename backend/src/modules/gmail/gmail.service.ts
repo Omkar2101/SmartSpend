@@ -9,16 +9,10 @@ export class GmailService {
   private userRepository = new UserRepository();
 
   async saveGmailConnection(code: string, clerkId: string) {
+    console.log("Authorization code:", code);
     const { tokens } = await oauth2Client.getToken(code);
-
+    console.log("Tokens received:", tokens);
     oauth2Client.setCredentials(tokens);
-
-    const oauth2 = google.oauth2({
-      auth: oauth2Client,
-      version: "v2",
-    });
-
-    const profile = await oauth2.userinfo.get();
 
     const user = await this.userRepository.findByClerkId(clerkId);
 
@@ -26,12 +20,32 @@ export class GmailService {
       throw new Error("User not found");
     }
 
-    return this.gmailRepository.upsertConnection({
+    return this.gmailRepository.upsertGmailConnection({
       userId: user.id,
-      googleEmail: profile.data.email || "",
+      googleEmail: user.email || "",
       accessToken: tokens.access_token || "",
       refreshToken: tokens.refresh_token || "",
       expiryDate: tokens.expiry_date ? new Date(tokens.expiry_date) : undefined,
     });
   }
+
+  generateAuthorizationUrl(
+    clerkId: string
+) {
+
+    return oauth2Client.generateAuthUrl({
+
+        access_type: "offline",
+
+        prompt: "consent",
+
+        scope: [
+            "https://www.googleapis.com/auth/gmail.readonly",
+        ],
+
+        state: clerkId,
+
+    });
+
+}
 }

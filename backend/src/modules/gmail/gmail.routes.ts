@@ -7,8 +7,13 @@ const router = Router();
 const gmailController = new GmailController();
 
 // router.get("/connect", requireAuth, gmailController.connect);
-router.get("/authorize", requireAuth, gmailController.initiateGmailAuthorization);
-
-router.get("/oauth/callback", gmailController.handleGmailAuthorizationCallback);
+// router.get("/connect", requireAuth, gmailController.initiateGmailAuthorization);
+// router.get("/connect", gmailController.initiateGmailAuthorization);
+router.get("/callback", gmailController.handleGmailAuthorizationCallback);
+router.get(
+    "/authorization-url",
+    requireAuth,
+    gmailController.generateAuthorizationUrl
+);
 
 export default router;
