@@ -47,5 +47,25 @@ export class GmailService {
 
     });
 
-}
+  }
+
+  async getConnection(clerkId: string) {
+    const user = await this.userRepository.findByClerkId(clerkId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return this.gmailRepository.findByUserId(user.id);
+  }
+
+  async disconnect(clerkId: string) {
+    const user = await this.userRepository.findByClerkId(clerkId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const connection = await this.gmailRepository.findByUserId(user.id);
+    if (!connection) {
+      throw new Error("No active Gmail connection found");
+    }
+    return this.gmailRepository.delete(user.id);
+  }
 }

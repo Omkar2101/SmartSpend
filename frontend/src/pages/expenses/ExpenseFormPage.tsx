@@ -11,7 +11,6 @@ import Alert from '../../components/common/Alert';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ROUTES from '../../routes/routes';
 import type { CreateInvoiceRequest } from '../../types';
-import mockDb from '../../utils/mockDb';
 import './ExpenseFormPage.css';
 
 export const ExpenseFormPage: React.FC = () => {
@@ -37,9 +36,9 @@ export const ExpenseFormPage: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [categoriesList, setCategoriesList] = useState<string[]>([]);
 
-  // Load active categories from mock DB
+  // Load active categories
   useEffect(() => {
-    const list = mockDb.getCategories().map(c => c.name);
+    const list = ['Food & Drinks', 'Transportation', 'Hosting & Cloud', 'Software Tools', 'Shopping', 'Utilities'];
     setCategoriesList(list);
     
     // Set default category if empty

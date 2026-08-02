@@ -66,4 +66,10 @@ export class GmailRepository {
 
   }
 
+  async delete(userId: string) {
+    return prisma.gmailConnection.delete({
+      where: { userId },
+    });
+  }
+
 }

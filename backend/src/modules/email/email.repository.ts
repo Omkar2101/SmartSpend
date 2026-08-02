@@ -41,6 +41,7 @@ export class EmailRepository {
         snippet: true,
         receivedAt: true,
         processed: true,
+        processingStatus: true,
         createdAt: true,
         userId: true,
       },

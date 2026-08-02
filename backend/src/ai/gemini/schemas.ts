@@ -4,22 +4,22 @@ export const ExpenseSchema =
     z.object({
 
         vendor:
-            z.string(),
+            z.string().nullable().optional(),
 
         amount:
             z.number(),
 
         currency:
-            z.string(),
+            z.string().nullable().optional(),
 
         category:
-            z.string(),
+            z.string().nullable().optional(),
 
         expenseDate:
-            z.string(),
+            z.string().nullable().optional(),
 
         confidence:
-            z.number(),
+            z.number().nullable().optional(),
 
     });
 

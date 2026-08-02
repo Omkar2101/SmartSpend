@@ -51,19 +51,19 @@ export class ExpenseProcessingWorker {
       const invoice = await this.invoiceRepository.createInvoice({
         userId: user.id,
 
-        emailMessageId,
+        emailMessageId: email.id,
 
-        vendor: extraction.vendor,
+        vendor: extraction.vendor || "Unknown Vendor",
 
         amount: extraction.amount,
 
-        currency: extraction.currency,
+        currency: extraction.currency || "INR",
 
-        category: extraction.category,
+        category: extraction.category || "Uncategorized",
 
-        confidence: extraction.confidence,
+        confidence: extraction.confidence ?? 1.0,
 
-        expenseDate: extraction.expenseDate,
+        expenseDate: extraction.expenseDate || undefined,
       });
 
       // STEP 5: Create a notification for the user to alert them of the newly processed expense
@@ -72,7 +72,7 @@ export class ExpenseProcessingWorker {
 
         "Expense Processed",
 
-        `${extraction.vendor} purchase of ₹${extraction.amount} added to ${extraction.category} category.`,
+        `${extraction.vendor || "Unknown Vendor"} purchase of ₹${extraction.amount} added to ${extraction.category || "Uncategorized"} category.`,
       );
 
       // STEP 6: Update the email status to PROCESSED once everything succeeds

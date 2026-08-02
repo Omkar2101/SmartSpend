@@ -105,5 +105,40 @@ export class GmailController {
 
     }
 
-};
+  };
+
+  getConnection = async (req: Request, res: Response) => {
+    try {
+      const clerkId = req.user!.clerkId;
+      const connection = await this.gmailService.getConnection(clerkId);
+      res.json({
+        success: true,
+        data: connection,
+      });
+    } catch (error) {
+      console.error("Error getting Gmail connection:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to get Gmail connection status",
+      });
+    }
+  };
+
+  disconnect = async (req: Request, res: Response) => {
+    try {
+      const clerkId = req.user!.clerkId;
+      await this.gmailService.disconnect(clerkId);
+      res.json({
+        success: true,
+        message: "Gmail disconnected successfully",
+      });
+    } catch (error: any) {
+      console.error("Error disconnecting Gmail:", error);
+      const status = error.message.includes("not found") ? 404 : 500;
+      res.status(status).json({
+        success: false,
+        message: error.message || "Failed to disconnect Gmail",
+      });
+    }
+  };
 }
