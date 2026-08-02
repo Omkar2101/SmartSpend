@@ -5,6 +5,7 @@ import userRoutes from "../modules/user/user.routes";
 import gmailRoutes from "../modules/gmail/gmail.routes";
 import emailRoutes from "../modules/email/email.routes";
 import expenseRoutes from "../modules/expense/expense.routes";
+import notificationRoutes from "../modules/notification/notification.routes";
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use("/gmail", gmailRoutes);
 router.use("/emails", emailRoutes);
 router.use("/expense", expenseRoutes);
 router.use("/expenses", expenseRoutes);
+router.use("/notifications", notificationRoutes);
 
 export default router;
